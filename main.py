@@ -1,26 +1,31 @@
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 
-model = OllamaLLM(model="llama3")
+def handle_conversation():
+  model = OllamaLLM(model="llama3")
+  context = ""
+  template = """
+  Answer the question below.
 
-# result = model.invoke(input="hello world")
+  Here is the conversation history: {context}
 
-# print(result)
+  Question: {question}
 
-template = """
-Answer the question below.
+  Answer:
+  """
 
-Here is the conversation history: {context}
+  prompt = ChatPromptTemplate.from_template(template)
 
-Question: {question}
+  chain = prompt | model
+  print("Welcome to the AI chatbot. Type exit to quit")
+  while True:
+    user_input = input("You: ")
+    if user_input.lower() == "exit":
+      break
+    result = chain.invoke({"context": context, "question": user_input})
+    print("Bot: ", result)
+    context += f"\nUser:{user_input}\n AI: {result}"
 
-Answer:
-"""
 
-prompt = ChatPromptTemplate.from_template(template)
+handle_conversation()
 
-chain = prompt | model
-
-result = chain.invoke({"context": "", "question": "how are you?"})
-
-print(result)
